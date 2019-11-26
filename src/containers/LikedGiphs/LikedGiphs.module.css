@@ -1,0 +1,33 @@
+.LikesContainer {
+    display: flex;
+    justify-content: center;
+    width: 90%;
+    flex-wrap: wrap;
+    margin: 0 5%;
+}
+
+.Hide {
+    display: none;
+}
+
+.Link {
+    color: blue;
+    text-decoration: none;
+    padding: 0 4px;
+}
+
+.Link:hover {
+    color: navy;
+    text-decoration: underline;
+}
+
+.Announcement {
+    color: red;
+    text-transform: uppercase;
+    margin: 12px auto;
+    padding: 4px;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    font-weight: 700;
+}

@@ -1,0 +1,12 @@
+.GiphItem {
+    width: 320px;
+    height: 240px;
+    padding: 10%;
+    box-sizing: border-box;
+}
+
+.GiphItemContainer {
+    margin: 1%;
+    border: 1px solid transparent;
+    box-shadow: 2px 2px 15px #ccc;
+}
