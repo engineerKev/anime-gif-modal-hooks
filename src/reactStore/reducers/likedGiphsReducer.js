@@ -1,7 +1,6 @@
+import * as actionTypes from '../actionTypes';
 
-import * as actionTypes from '../actions/actionTypes';
-
-const initialState = {
+export const initialState = {
     likedGiphs: [],
     hasLikes: false,
     error: null,
@@ -9,46 +8,46 @@ const initialState = {
     fetchedSavedLikes: false
 };
 
-const reducer = (state = initialState, action) => {
-    let likedGiphsArray;
-    switch(action.type) {
+export const reducer = (state, action) => {
+    let likedGiphsArray = [];
+    switch (action.type) {
         case actionTypes.SAVE_LIKE:
-            likedGiphsArray = [...state.likedGiphs, action.data]; 
+            likedGiphsArray = [...state.likedGiphs, action.like];
             return {
                 ...state,
                 likedGiphs: likedGiphsArray,
                 hasLikes: likedGiphsArray.length !== 0,
                 error: null
             }
-        case actionTypes.UPDATE_LIKED_GIPHS: 
+        case actionTypes.UPDATE_LIKED_GIPHS:
             return {
                 ...state,
-               hasLikes: action.data.length !== 0,
-               likedGiphs: [...action.data],
-               error: null
+                hasLikes: action.likes.length !== 0,
+                likedGiphs: [...action.likes],
+                error: null
             }
-        case actionTypes.GET_USER_LIKES_START: 
+        case actionTypes.GET_USER_LIKES_START:
             return {
                 ...state,
-               error: null,
-               isLoading: true
+                error: null,
+                isLoading: true
             }
         case actionTypes.GET_USER_LIKES_SUCCESS:
             likedGiphsArray = [...state.likedGiphs, ...action.likes];
             return {
                 ...state,
-               likedGiphs: likedGiphsArray,
-               hasLikes: likedGiphsArray.length !== 0,
-               isLoading: false,
-               fetchedSavedLikes: true, 
+                likedGiphs: likedGiphsArray,
+                hasLikes: likedGiphsArray.length !== 0,
+                isLoading: false,
+                fetchedSavedLikes: true,
             }
-        case actionTypes.GET_USER_LIKES_FAILED: 
+        case actionTypes.GET_USER_LIKES_FAILED:
             return {
                 ...state,
-               error: action.error,
-               isLoading: false
+                error: action.error,
+                isLoading: false
             }
-        case actionTypes.CLEAR_LIKES: 
+        case actionTypes.CLEAR_LIKES:
             return {
                 ...state,
                 likedGiphs: [],
@@ -64,5 +63,3 @@ const reducer = (state = initialState, action) => {
             return state;
     }
 }
-
-export default reducer;

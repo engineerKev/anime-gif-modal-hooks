@@ -1,34 +1,75 @@
 import React, { useEffect, useContext } from 'react';
-import { connect } from 'react-redux';
 import { withRouter, Link, Redirect } from 'react-router-dom';
+import axios from '../../axios-save-likes';
 
 import LikedGiphItems from '../LikedGiphItems/LikedGiphItems';
 import Aux from '../../hoc/Aux';
 import AdjacentButtons from '../../components/UI/AdjacentButtons/AdjacentButtons';
 import Spinner from '../../components/UI/Spinner/Spinner';
 import classes from './LikedGiphs.module.css';
-import * as actions from '../../store/actions/index';
 import { AuthContext } from '../../context/auth-context';
+import { SavedLikedGiphsContext } from '../../context/likedGiphs-context';
+import * as actionTypes from '../../reactStore/actionTypes';
+
 
 const likedGiphs = (props) => {
     const { authData } = useContext(AuthContext);
-    const { userId: userIdHooks, token: tokenHooks }  = authData;
-    const { fetchedSavedLikes, getUserLikes } = props;
+    const { saveLikes: saveLikesHooks } = useContext(SavedLikedGiphsContext);
 
-    useEffect(() => { 
-        if (!fetchedSavedLikes) {
-            getUserLikes(tokenHooks, userIdHooks);
+    const { userId: userIdHooks, token: tokenHooks }  = authData;
+    const { savedLikesDispatch, savedLikesState } = props;
+
+    const getUserLikesHooks = (token, userId) => {
+        savedLikesDispatch({
+            type: actionTypes.GET_USER_LIKES_START
+        });
+        if(token && userId) {
+            const queryParams = '?auth=' + token + '&orderBy="userId"&equalTo="' + userId +'"';
+            axios.get('/liked-giphys.json'+queryParams)
+                .then(response => {
+                    console.log(response)
+                    let likedGiphsArr = [];
+                    for(let key in response.data) {
+                        likedGiphsArr = likedGiphsArr.concat(response.data[key].likes);
+                    }
+                    savedLikesDispatch({
+                        type: actionTypes.GET_USER_LIKES_SUCCESS,
+                        likes:  likedGiphsArr
+                    })
+                })
+                .catch(err => {
+                    console.log(err);
+                    savedLikesDispatch({
+                        type: actionTypes.GET_USER_LIKES_FAILED,
+                        error: err
+                    })
+
+                });
+        } else {
+            savedLikesDispatch({
+                type: actionTypes.ONLY_LOAD_LOCAL_LIKES
+            })
         }
-    }, [fetchedSavedLikes, getUserLikes]);
+    }
+
+    useEffect(() => {
+        const {fetchedSavedLikes: fetchedSavedLikesHooks} = savedLikesState;
+        if (!fetchedSavedLikesHooks) {
+            getUserLikesHooks(tokenHooks, userIdHooks);
+        }
+    }, [savedLikesState.fetchedSavedLikes]);
     const unlikeGiph = (giphUrl) => {
-        const { likedGiphs, updateLikedGiphs } = props;
-        const updatedLikedGiphs = likedGiphs.filter(giphObj => giphObj.url !== giphUrl)
-        updateLikedGiphs(updatedLikedGiphs);
+        const { likedGiphs: likedGiphsHooks } = savedLikesState;
+        const updatedLikedGiphs = likedGiphsHooks.filter(giphObj => giphObj.url !== giphUrl)
+        savedLikesDispatch({
+            type: actionTypes.UPDATE_LIKED_GIPHS,
+            likes: updatedLikedGiphs
+        })
     }
 
     const saveLikesBtnClasses = () => {
-        const { showLoggedInButtons } = props;
-        const auxilaryClasses = showLoggedInButtons ? '' : 'Hide';
+        const { savedLikesState } = props;
+        const auxilaryClasses = savedLikesState.hasLikes ? '' : 'Hide';
         return `${auxilaryClasses}`;
     }
 
@@ -56,7 +97,7 @@ const likedGiphs = (props) => {
             type: "Success",
             extraClasses: saveLikesBtnClasses,
             text: 'Save Likes',
-            clickHandler: () => { props.saveLikes(props.likedGiphs, tokenHooks, userIdHooks) }
+            clickHandler: () => { saveLikesHooks(savedLikesState.likedGiphs, tokenHooks, userIdHooks) }
         },
         {
             type: "Success",
@@ -67,16 +108,16 @@ const likedGiphs = (props) => {
     ];
 
     const renderOrRedirect = () => {
-        const { likedGiphs } = props;
+        const { savedLikesState } = props;
 
-        if ((tokenHooks && userIdHooks) || likedGiphs.length) {
+        if ((tokenHooks && userIdHooks) || savedLikesState.likedGiphs.length) {
             return (
                 <Aux>
                     <div>
                         {ifUserSaveLikes()}
                     </div>
                     <div className={classes.LikesContainer}>
-                        <LikedGiphItems likedGiphs={likedGiphs} unlike={unlikeGiph} />
+                        <LikedGiphItems likedGiphs={savedLikesState.likedGiphs} unlike={unlikeGiph} />
                     </div>
                 </Aux>
             )
@@ -85,24 +126,7 @@ const likedGiphs = (props) => {
         }
     }
 
-    return props.isLoading ? <Spinner /> : renderOrRedirect();
+    return props.savedLikesState.isLoading ? <Spinner /> : renderOrRedirect();
 }
 
-const mapStateToProps = state => {
-    return {
-        likedGiphs: state.likedGiphs.likedGiphs,
-        showLoggedInButtons: state.likedGiphs.hasLikes,
-        isLoading: state.likedGiphs.isLoading,
-        fetchedSavedLikes: state.likedGiphs.fetchedSavedLikes
-    }
-}
-
-const mapDispatchToProps = dispatch => {
-    return {
-        updateLikedGiphs: (updatedLikedGiphs) => dispatch(actions.updateLikedGiphs(updatedLikedGiphs)),
-        saveLikes: (likes, token, userId) => dispatch(actions.saveLikes(likes, token, userId)),
-        getUserLikes: (token, userId) => dispatch(actions.getUserLikes(token, userId))
-    }
-}
-
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(likedGiphs));
+export default withRouter(likedGiphs);

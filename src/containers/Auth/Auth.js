@@ -1,11 +1,9 @@
 import React, { useState, useContext } from 'react';
-import { connect } from 'react-redux';
 import { Redirect } from 'react-router-dom';
 
 import Input from '../../components/UI/Input/Input';
 import Button from '../../components/UI/Button/Button';
 import Aux from '../../hoc/Aux';
-import * as  actions from '../../store/actions/index';
 import classes from './Auth.module.css';
 import { AuthContext } from '../../context/auth-context';
 
@@ -74,7 +72,6 @@ const auth = (props) => {
 
     const submitHandler = (event) => {
         event.preventDefault();
-        //HERE GET AUTHENTICATION FUNCTION FROM AUTH CONTEXT PROVIDER
         authenticate(authFormControls.email.value, authFormControls.password.value, isSignup);
     }
 
@@ -83,7 +80,6 @@ const auth = (props) => {
     }
 
     const authRender = (formContents) => {
-        //HERE USE CONTEXT -> authData.userId
         if (authData.userId) {
             return (
                 <Redirect to="/" />

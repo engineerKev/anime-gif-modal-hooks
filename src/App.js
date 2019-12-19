@@ -1,4 +1,4 @@
-import React, { useEffect, Suspense, useContext } from 'react';
+import React, { useEffect, Suspense, useContext, useReducer } from 'react';
 import { Route, Switch, BrowserRouter, Redirect } from 'react-router-dom';
 
 import './App.css';
@@ -7,6 +7,8 @@ import Auth from './containers/Auth/Auth';
 import Logout from './containers/Auth/Logout/Logout';
 import Layout from './components/Layout/Layout';
 import { AuthContext } from './context/auth-context';
+import SavedLikesProvider from './context/likedGiphs-context';
+import {initialState as likedGiphsInitialState, reducer as likedGiphsReducer} from './reactStore/reducers/likedGiphsReducer';
 
 const LikedGiphs = React.lazy(() => {
   return import('./containers/LikedGiphs/LikedGiphs')
@@ -15,6 +17,7 @@ const LikedGiphs = React.lazy(() => {
 const app = (props) => {
   const { authData, tryAutoSignIn } = useContext(AuthContext);
   const { token: isAuthenticatedHooks} = authData
+  const [savedLikedState, savedLikedDispatch] = useReducer(likedGiphsReducer, likedGiphsInitialState);
   useEffect(() => {
     tryAutoSignIn();
   }, []);
@@ -24,19 +27,57 @@ const app = (props) => {
   let routes = (
     <Switch>
       <Route path="/auth" component={Auth} />
-      <Route path="/likes" render={(props) => <LikedGiphs {...props} />} />
-      <Route path="/" exact component={GiphModal} />
+      <Route path="/likes" render={(props) => {
+        return (
+          <SavedLikesProvider>
+            <LikedGiphs 
+              savedLikesDispatch={savedLikedDispatch}
+              savedLikesState={savedLikedState} 
+              {...props} 
+            />
+          </SavedLikesProvider>
+        )
+      }} />
+      <Route path="/" exact render={(props) => {
+        return (
+          <GiphModal 
+            savedLikedState={savedLikedState}
+            savedLikedDispatch={savedLikedDispatch} 
+            {...props} />
+        )
+      }} />
       <Redirect to="/" />
     </Switch>
 
   );
-  //GET AUTH CONTEXT IN ORDER TO USE TOKEN 
+  
   if (isAuthenticatedHooks) {
     routes = (
       <Switch>
-        <Route path="/logout" component={Logout} />
-        <Route path="/likes" render={(props) => <LikedGiphs {...props} />} />
-        <Route path="/" exact component={GiphModal} />
+        <Route path="/logout" component={(props) => {
+          return(
+            <Logout savedLikedDispatch={savedLikedDispatch} {...props} />
+          );
+        }} />
+      <Route path="/likes" render={(props) => {
+        return (
+          <SavedLikesProvider>
+            <LikedGiphs 
+              savedLikesDispatch={savedLikedDispatch}
+              savedLikesState={savedLikedState} 
+              {...props} 
+            />
+          </SavedLikesProvider>
+        )
+      }} />
+      <Route path="/" exact render={(props) => {
+        return (
+          <GiphModal 
+            savedLikedState={savedLikedState}
+            savedLikedDispatch={savedLikedDispatch} 
+            {...props} />
+        )
+      }} />
         <Redirect to="/" />
       </Switch>
 
@@ -45,7 +86,9 @@ const app = (props) => {
   return (
     <div className="App">
       <BrowserRouter>
-        <Layout>
+        <Layout
+            savedLikedState={savedLikedState}
+        >
           <Suspense fallback={<p>Loading...</p>}>{routes}</Suspense>
         </Layout>
       </BrowserRouter>

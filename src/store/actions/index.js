@@ -16,7 +16,6 @@ export {
 export {
     saveLikedGiph,
     updateLikedGiphs,
-    saveLikes,
     getUserLikes,
     clearLikes
 } from './likedGiphs' 

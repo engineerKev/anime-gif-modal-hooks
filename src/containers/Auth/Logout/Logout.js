@@ -1,27 +1,21 @@
 import React, { useEffect, useContext } from 'react';
-import { connect } from 'react-redux';
 import { Redirect } from 'react-router-dom';
 
-import * as actions from '../../../store/actions/index';
+import * as actionTypes from '../../../store/actions/actionTypes';
 import { AuthContext } from '../../../context/auth-context';
 
 
 const logout = (props) => {
     const { logout: logoutHooks } = useContext(AuthContext);
-    const {clearLikes} = props;
+    const { savedLikedDispatch } = props;
     useEffect(() => {
         logoutHooks();
-        clearLikes();
-    }, [logoutHooks, clearLikes]);
+        savedLikedDispatch({
+            type: actionTypes.CLEAR_LIKES
+        })
+    }, [logoutHooks, savedLikedDispatch]);
 
     return <Redirect to="/" />;
 }
 
-const mapDispatchToProps = dispatch => {
-    return {
-        clearLikes: () => { dispatch(actions.clearLikes()) }
-    }
-};
-
-
-export default connect(null, mapDispatchToProps)(logout);
+export default logout;

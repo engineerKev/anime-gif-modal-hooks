@@ -1,5 +1,4 @@
 import React, {useContext } from 'react';
-import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 
 import NavigationItems from '../NavigationItems/NavigationItems';
@@ -9,8 +8,7 @@ import { AuthContext } from '../../../context/auth-context';
 const toolbar = (props) => {
     const userIdHooks = useContext(AuthContext).authData.userId;
     const generateNavItems = () => {
-        //USE USERID FROM AUTH CONTEXT HERE
-        const { hasLikes } = props;
+        const { hasLikesHooks } = props;
         let navElements = [
             {
                 active: false,
@@ -22,7 +20,7 @@ const toolbar = (props) => {
                 active: false,
                 path: "/likes",
                 text: "My Likes",
-                show: hasLikes || userIdHooks
+                show: hasLikesHooks || userIdHooks
             },
             {
                 active: false,
@@ -63,10 +61,4 @@ const toolbar = (props) => {
     );
 }
 
-const mapStateToProps = state => {
-    return {
-        hasLikes: state.likedGiphs.hasLikes,
-    }
-}
-
-export default withRouter(connect(mapStateToProps)(toolbar));
+export default withRouter(toolbar);

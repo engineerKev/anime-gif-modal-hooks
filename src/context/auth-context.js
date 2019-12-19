@@ -3,9 +3,7 @@ import axios from 'axios';
 
 import * as projectData from '../creds';
 
-export const AuthContext = React.createContext({ 
-    auth: {} 
-});
+export const AuthContext = React.createContext();
 
 export default props => {
     const [authObj, setAuthObj] = useState({

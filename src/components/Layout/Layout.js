@@ -6,7 +6,7 @@ import Toolbar from '../Navigation/Toolbar/Toolbar';
 const layout = (props) => {
     return (
         <Aux>
-            <Toolbar />
+            <Toolbar hasLikesHooks={props.savedLikedState.hasLikes} />
             <main>
                 {props.children}
             </main>

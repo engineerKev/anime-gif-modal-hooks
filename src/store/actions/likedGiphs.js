@@ -8,23 +8,15 @@ export const saveLikedGiph = (payload) => {
     }
 }
 
-export const updateLikedGiphs = (payload) => {
+export const updateLikedGiphs = () => {
     return {
-        type: actionTypes.UPDATE_LIKED_GIPHS,
-        data: payload
+        type: actionTypes.UPDATE_LIKED_GIPHS
     }
 }
 
-export const userLikesSavedSuccess = () => {
+export const useCurrentLikes = () => {
     return {
-       type: actionTypes.SAVED_LIKES_SUCCESS 
-    }
-}
-
-export const userLikesSavedFailed = (error) => {
-    return {
-       type: actionTypes.SAVED_LIKES_FAILED,
-       error: error 
+        type: actionTypes.ONLY_LOAD_LOCAL_LIKES,
     }
 }
 
@@ -53,25 +45,6 @@ export const clearLikes = () => {
     }
 }
 
-export const saveLikes = (payload, token, userId) => {
-    return dispatch => {
-        const userLikes = {
-            likes: [...payload],
-            userId: userId
-        };
-        console.log(userLikes)
-        axios.put('/liked-giphys/'+userId+'.json?auth='+token, userLikes)
-            .then(response => {
-                console.log(response);
-                dispatch(userLikesSavedSuccess())
-            })
-            .catch(err => {
-                console.log(err);
-                dispatch(userLikesSavedFailed(err))
-            })
-    }
-}
-
 export const getUserLikes = (token, userId) => {
     return dispatch => {
         dispatch(getUserLikesStart());
@@ -92,7 +65,7 @@ export const getUserLikes = (token, userId) => {
 
                 });
         } else {
-            dispatch(getUserLikesSuccess([]));
+            dispatch(useCurrentLikes());
         }
     }
 }
