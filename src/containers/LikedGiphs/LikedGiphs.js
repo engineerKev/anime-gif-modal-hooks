@@ -8,16 +8,36 @@ import AdjacentButtons from '../../components/UI/AdjacentButtons/AdjacentButtons
 import Spinner from '../../components/UI/Spinner/Spinner';
 import classes from './LikedGiphs.module.css';
 import { AuthContext } from '../../context/auth-context';
-import { SavedLikedGiphsContext } from '../../context/likedGiphs-context';
 import * as actionTypes from '../../reactStore/actionTypes';
 
 
 const likedGiphs = (props) => {
     const { authData } = useContext(AuthContext);
-    const { saveLikes: saveLikesHooks } = useContext(SavedLikedGiphsContext);
 
     const { userId: userIdHooks, token: tokenHooks }  = authData;
-    const { savedLikesDispatch, savedLikesState } = props;
+    const { savedLikesState, savedLikesDispatch } = props;
+
+    const saveLikesHooks = (likes, token, userId) => {
+        const likesPayload = {
+            likes: [...likes],
+            userId: userId
+        }
+        axios.put('/liked-giphys/'+userId+'.json?auth='+token, likesPayload)
+            .then(response => {
+                console.log("LIKES SAVED!!!");
+                console.log(response);
+                savedLikesDispatch({
+                    type: actionTypes.SAVED_LIKES_SUCCESS
+                });
+            })
+            .catch(err => {
+                console.log("da error",err.toString());
+                savedLikesDispatch({
+                    type: actionTypes.SAVED_LIKES_FAILED,
+                    error: err.toString()
+                });
+            })
+    }
 
     const getUserLikesHooks = (token, userId) => {
         savedLikesDispatch({
@@ -41,7 +61,7 @@ const likedGiphs = (props) => {
                     console.log(err);
                     savedLikesDispatch({
                         type: actionTypes.GET_USER_LIKES_FAILED,
-                        error: err
+                        error: err.toString()
                     })
 
                 });

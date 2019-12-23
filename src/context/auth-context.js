@@ -24,12 +24,12 @@ export default props => {
                 token: null
             }
         });
-    });
+    }, [authObj.userId, authObj.token]);
 
     const checkAuthTimeoutHooks = useCallback((expirationTime) => {
         setTimeout(() => {
             logoutHooks()
-        }, expirationTime * 1000);
+        }, expirationTime );
     }, [logoutHooks]);
 
     const authCheckStateHooks = useCallback(() => {
@@ -47,8 +47,7 @@ export default props => {
                         token: token
                     } 
                 });
-                
-                checkAuthTimeoutHooks(expirationDate.getSeconds() - new Date().getSeconds());
+                checkAuthTimeoutHooks(expirationDate.getTime() - new Date().getTime());
             } else {
                 logoutHooks();
             }
@@ -76,14 +75,14 @@ export default props => {
                         userId: response.data.localId
                     } 
                 });
-                checkAuthTimeoutHooks(response.data.expiresIn)
+                checkAuthTimeoutHooks(response.data.expiresIn * 1000)
             })
             .catch(err => {
                 console.log(err);
                 setAuthObj(prevAuthState => {
                     return {
                         ...prevAuthState,
-                        error: err
+                        error: err.toString()
                     } 
                 });
             })

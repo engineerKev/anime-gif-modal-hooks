@@ -11,6 +11,16 @@ export const initialState = {
 export const reducer = (state, action) => {
     let likedGiphsArray = [];
     switch (action.type) {
+        case actionTypes.SAVED_LIKES_SUCCESS:
+            return {
+                ...state,
+                error: null
+            }
+        case actionTypes.SAVED_LIKES_FAILED:
+            return {
+                ...state,
+                error: action.error
+            }
         case actionTypes.SAVE_LIKE:
             likedGiphsArray = [...state.likedGiphs, action.like];
             return {

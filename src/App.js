@@ -7,7 +7,6 @@ import Auth from './containers/Auth/Auth';
 import Logout from './containers/Auth/Logout/Logout';
 import Layout from './components/Layout/Layout';
 import { AuthContext } from './context/auth-context';
-import SavedLikesProvider from './context/likedGiphs-context';
 import {initialState as likedGiphsInitialState, reducer as likedGiphsReducer} from './reactStore/reducers/likedGiphsReducer';
 
 const LikedGiphs = React.lazy(() => {
@@ -20,7 +19,7 @@ const app = (props) => {
   const [savedLikedState, savedLikedDispatch] = useReducer(likedGiphsReducer, likedGiphsInitialState);
   useEffect(() => {
     tryAutoSignIn();
-  }, []);
+  }, [tryAutoSignIn]);
 
 
 
@@ -29,13 +28,11 @@ const app = (props) => {
       <Route path="/auth" component={Auth} />
       <Route path="/likes" render={(props) => {
         return (
-          <SavedLikesProvider>
-            <LikedGiphs 
-              savedLikesDispatch={savedLikedDispatch}
-              savedLikesState={savedLikedState} 
-              {...props} 
-            />
-          </SavedLikesProvider>
+          <LikedGiphs
+            savedLikesDispatch={savedLikedDispatch}
+            savedLikesState={savedLikedState}
+            {...props}
+          />
         )
       }} />
       <Route path="/" exact render={(props) => {
@@ -61,13 +58,11 @@ const app = (props) => {
         }} />
       <Route path="/likes" render={(props) => {
         return (
-          <SavedLikesProvider>
-            <LikedGiphs 
-              savedLikesDispatch={savedLikedDispatch}
-              savedLikesState={savedLikedState} 
-              {...props} 
-            />
-          </SavedLikesProvider>
+          <LikedGiphs
+            savedLikesDispatch={savedLikedDispatch}
+            savedLikesState={savedLikedState}
+            {...props}
+          />
         )
       }} />
       <Route path="/" exact render={(props) => {

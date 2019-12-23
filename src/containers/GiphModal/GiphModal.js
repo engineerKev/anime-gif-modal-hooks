@@ -32,7 +32,7 @@ const giphModal = (props) => {
         setModalGiphObj(data);
       })
       .catch(error => {
-        console.error(error.data.message)
+        console.error(error)
       })
   }
   
