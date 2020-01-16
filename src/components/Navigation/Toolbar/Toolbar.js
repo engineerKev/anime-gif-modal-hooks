@@ -33,6 +33,12 @@ const toolbar = (props) => {
                 path: "/logout",
                 text: "Logout",
                 show: userIdHooks !== null
+            },
+            {
+                active: false,
+                path: "/carousel",
+                text: "Carousel",
+                show: true
             }
         ];
         const indexOfRoute = getIndexOfCurrentRoute(navElements);

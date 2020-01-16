@@ -1,11 +1,48 @@
 import * as actionTypes from '../actionTypes';
+import axios from '../../axios-save-likes';
+
+export const fetchLikes = (likesDispatch) => {
+    return (token, userId) => {
+        likesDispatch({
+            type: actionTypes.GET_USER_LIKES_START
+        });
+        if (token && userId) {
+            const queryParams = '?auth=' + token + '&orderBy="userId"&equalTo="' + userId + '"';
+            axios.get('/liked-giphys.json' + queryParams)
+                .then(response => {
+                    console.log(response)
+                    let likedGiphsArr = [];
+                    for (let key in response.data) {
+                        likedGiphsArr = likedGiphsArr.concat(response.data[key].likes);
+                    }
+                    likesDispatch({
+                        type: actionTypes.GET_USER_LIKES_SUCCESS,
+                        likes: likedGiphsArr
+                    })
+                })
+                .catch(err => {
+                    console.log(err);
+                    likesDispatch({
+                        type: actionTypes.GET_USER_LIKES_FAILED,
+                        error: err.toString()
+                    })
+
+                });
+        } else {
+            likesDispatch({
+                type: actionTypes.ONLY_LOAD_LOCAL_LIKES
+            })
+        }
+    }
+}
 
 export const initialState = {
     likedGiphs: [],
     hasLikes: false,
     error: null,
     isLoading: false,
-    fetchedSavedLikes: false
+    fetchedSavedLikes: false,
+    fetchUserLikes: fetchLikes
 };
 
 export const reducer = (state, action) => {

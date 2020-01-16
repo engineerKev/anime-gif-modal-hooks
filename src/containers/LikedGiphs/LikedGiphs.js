@@ -15,8 +15,15 @@ const likedGiphs = (props) => {
     const { authData } = useContext(AuthContext);
 
     const { userId: userIdHooks, token: tokenHooks }  = authData;
-    const { savedLikesState, savedLikesDispatch } = props;
+    const { savedLikesState, savedLikesDispatch, fetchUserLikes } = props;
 
+    useEffect(() => {
+        const {fetchedSavedLikes: fetchedSavedLikesHooks} = savedLikesState;
+        if (!fetchedSavedLikesHooks) {
+            fetchUserLikes(tokenHooks, userIdHooks);
+        }
+    }, [savedLikesState.fetchedSavedLikes]);
+    
     const saveLikesHooks = (likes, token, userId) => {
         const likesPayload = {
             likes: [...likes],
@@ -39,45 +46,46 @@ const likedGiphs = (props) => {
             })
     }
 
-    const getUserLikesHooks = (token, userId) => {
-        savedLikesDispatch({
-            type: actionTypes.GET_USER_LIKES_START
-        });
-        if(token && userId) {
-            const queryParams = '?auth=' + token + '&orderBy="userId"&equalTo="' + userId +'"';
-            axios.get('/liked-giphys.json'+queryParams)
-                .then(response => {
-                    console.log(response)
-                    let likedGiphsArr = [];
-                    for(let key in response.data) {
-                        likedGiphsArr = likedGiphsArr.concat(response.data[key].likes);
-                    }
-                    savedLikesDispatch({
-                        type: actionTypes.GET_USER_LIKES_SUCCESS,
-                        likes:  likedGiphsArr
-                    })
-                })
-                .catch(err => {
-                    console.log(err);
-                    savedLikesDispatch({
-                        type: actionTypes.GET_USER_LIKES_FAILED,
-                        error: err.toString()
-                    })
+    // const getUserLikesHooks = (token, userId) => {
+    //     savedLikesDispatch({
+    //         type: actionTypes.GET_USER_LIKES_START
+    //     });
+    //     if(token && userId) {
+    //         const queryParams = '?auth=' + token + '&orderBy="userId"&equalTo="' + userId +'"';
+    //         axios.get('/liked-giphys.json'+queryParams)
+    //             .then(response => {
+    //                 console.log(response)
+    //                 let likedGiphsArr = [];
+    //                 for(let key in response.data) {
+    //                     likedGiphsArr = likedGiphsArr.concat(response.data[key].likes);
+    //                 }
+    //                 savedLikesDispatch({
+    //                     type: actionTypes.GET_USER_LIKES_SUCCESS,
+    //                     likes:  likedGiphsArr
+    //                 })
+    //             })
+    //             .catch(err => {
+    //                 console.log(err);
+    //                 savedLikesDispatch({
+    //                     type: actionTypes.GET_USER_LIKES_FAILED,
+    //                     error: err.toString()
+    //                 })
 
-                });
-        } else {
-            savedLikesDispatch({
-                type: actionTypes.ONLY_LOAD_LOCAL_LIKES
-            })
-        }
-    }
+    //             });
+    //     } else {
+    //         savedLikesDispatch({
+    //             type: actionTypes.ONLY_LOAD_LOCAL_LIKES
+    //         })
+    //     }
+    // }
 
-    useEffect(() => {
-        const {fetchedSavedLikes: fetchedSavedLikesHooks} = savedLikesState;
-        if (!fetchedSavedLikesHooks) {
-            getUserLikesHooks(tokenHooks, userIdHooks);
-        }
-    }, [savedLikesState.fetchedSavedLikes]);
+    // useEffect(() => {
+    //     const {fetchedSavedLikes: fetchedSavedLikesHooks} = savedLikesState;
+    //     if (!fetchedSavedLikesHooks) {
+    //         getUserLikesHooks(tokenHooks, userIdHooks);
+    //     }
+    // }, [savedLikesState.fetchedSavedLikes]);
+    
     const unlikeGiph = (giphUrl) => {
         const { likedGiphs: likedGiphsHooks } = savedLikesState;
         const updatedLikedGiphs = likedGiphsHooks.filter(giphObj => giphObj.url !== giphUrl)

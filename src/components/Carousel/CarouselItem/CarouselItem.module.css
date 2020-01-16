@@ -1,0 +1,22 @@
+.Item {
+    width: 90%;
+    height: 100%;
+    margin: 0 auto;
+}
+
+.Fade {
+    animation-name: fade;
+    animation-duration: 1.5s;
+}
+
+@keyframes fade {
+    from { opacity: .4; }
+    to { opacity: 1; }
+}
+
+.Title {
+    font-weight: 600;
+    padding: 16px 0; 
+    font-size: 24px;
+    display: none;
+}

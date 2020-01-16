@@ -6,8 +6,9 @@ import GiphModal from './containers/GiphModal/GiphModal';
 import Auth from './containers/Auth/Auth';
 import Logout from './containers/Auth/Logout/Logout';
 import Layout from './components/Layout/Layout';
+import Carousel from './components/Carousel/Carousel';
 import { AuthContext } from './context/auth-context';
-import {initialState as likedGiphsInitialState, reducer as likedGiphsReducer} from './reactStore/reducers/likedGiphsReducer';
+import {initialState as likedGiphsInitialState, reducer as likedGiphsReducer, fetchLikes } from './reactStore/reducers/likedGiphsReducer';
 
 const LikedGiphs = React.lazy(() => {
   return import('./containers/LikedGiphs/LikedGiphs')
@@ -17,20 +18,21 @@ const app = (props) => {
   const { authData, tryAutoSignIn } = useContext(AuthContext);
   const { token: isAuthenticatedHooks} = authData
   const [savedLikedState, savedLikedDispatch] = useReducer(likedGiphsReducer, likedGiphsInitialState);
+  const fetchLikesCustom = fetchLikes(savedLikedDispatch);
   useEffect(() => {
     tryAutoSignIn();
   }, [tryAutoSignIn]);
 
-
-
   let routes = (
     <Switch>
+      <Route path="/carousel" component={Carousel} />
       <Route path="/auth" component={Auth} />
       <Route path="/likes" render={(props) => {
         return (
           <LikedGiphs
             savedLikesDispatch={savedLikedDispatch}
             savedLikesState={savedLikedState}
+            fetchUserLikes={fetchLikesCustom}
             {...props}
           />
         )
@@ -51,6 +53,7 @@ const app = (props) => {
   if (isAuthenticatedHooks) {
     routes = (
       <Switch>
+        <Route path="/carousel" component={Carousel} />
         <Route path="/logout" component={(props) => {
           return(
             <Logout savedLikedDispatch={savedLikedDispatch} {...props} />
@@ -61,6 +64,7 @@ const app = (props) => {
           <LikedGiphs
             savedLikesDispatch={savedLikedDispatch}
             savedLikesState={savedLikedState}
+            fetchUserLikes={fetchLikesCustom}
             {...props}
           />
         )
