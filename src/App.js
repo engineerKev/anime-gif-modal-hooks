@@ -16,7 +16,7 @@ const LikedGiphs = React.lazy(() => {
 
 const app = (props) => {
   const { authData, tryAutoSignIn } = useContext(AuthContext);
-  const { token: isAuthenticatedHooks} = authData
+  const { token: isAuthenticatedHooks } = authData
   const [savedLikedState, savedLikedDispatch] = useReducer(likedGiphsReducer, likedGiphsInitialState);
   const fetchLikesCustom = fetchLikes(savedLikedDispatch);
   useEffect(() => {
@@ -25,7 +25,12 @@ const app = (props) => {
 
   let routes = (
     <Switch>
-      <Route path="/carousel" component={Carousel} />
+      <Route path="/carousel" render={(props) => {
+          return <Carousel 
+            savedLikesState={savedLikedState}
+            fetchUserLikes={fetchLikesCustom}
+          />
+      }} />
       <Route path="/auth" component={Auth} />
       <Route path="/likes" render={(props) => {
         return (
@@ -53,7 +58,12 @@ const app = (props) => {
   if (isAuthenticatedHooks) {
     routes = (
       <Switch>
-        <Route path="/carousel" component={Carousel} />
+        <Route path="/carousel" render={(props) => {
+          return <Carousel 
+            savedLikesState={savedLikedState}
+            fetchUserLikes={fetchLikesCustom}
+          />
+        }} />
         <Route path="/logout" component={(props) => {
           return(
             <Logout savedLikedDispatch={savedLikedDispatch} {...props} />

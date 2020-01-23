@@ -38,7 +38,7 @@ const toolbar = (props) => {
                 active: false,
                 path: "/carousel",
                 text: "Carousel",
-                show: true
+                show: hasLikesHooks || userIdHooks
             }
         ];
         const indexOfRoute = getIndexOfCurrentRoute(navElements);

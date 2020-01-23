@@ -42,7 +42,6 @@ export const initialState = {
     error: null,
     isLoading: false,
     fetchedSavedLikes: false,
-    fetchUserLikes: fetchLikes
 };
 
 export const reducer = (state, action) => {
